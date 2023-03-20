@@ -41,7 +41,7 @@
 		});
 
 		function download(filename, text) {
-            const negatedFilename = filename.replace('.jff', '_negated.jff');
+			const negatedFilename = filename.replace('.jff', '_negated.jff');
 
 			const element = document.createElement('a');
 			element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
