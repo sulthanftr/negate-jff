@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Negate JFF File</title>
+</head>
+<body>
+	<h1>Negate JFF File</h1>
+	<p>hint: make sure it's a DFA!</p>
+	<input type="file" id="file-input">
+	<button id="edit-button">Negate File</button>
+
+	<script>
+		document.getElementById('edit-button').addEventListener('click', () => {
+			const fileInput = document.getElementById('file-input');
+			const file = fileInput.files[0];
+			
+			if (file) {
+				const reader = new FileReader();
+				reader.onload = () => {
+					const parser = new DOMParser();
+					const xmlDoc = parser.parseFromString(reader.result, 'text/xml');
+					
+					const automaton = xmlDoc.querySelector('automaton');
+					
+					for (const state of automaton.querySelectorAll('state')) {
+						const final = state.querySelector('final');
+						if (final) {
+							state.removeChild(final);
+						} else {
+							state.appendChild(xmlDoc.createElement('final'));
+						}
+					}
+					
+					const serializer = new XMLSerializer();
+					const xmlString = serializer.serializeToString(xmlDoc);
+					
+					download(file.name, xmlString);
+				};
+				reader.readAsText(file);
+			}
+		});
+
+		function download(filename, text) {
+            const negatedFilename = filename.replace('.jff', '_negated.jff');
+
+			const element = document.createElement('a');
+			element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+			element.setAttribute('download', negatedFilename);
+
+			element.style.display = 'none';
+			document.body.appendChild(element);
+
+			element.click();
+
+			document.body.removeChild(element);
+		}
+	</script>
+</body>
+</html>
